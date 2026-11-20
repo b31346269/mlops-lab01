@@ -1,0 +1,50 @@
+name: Lab 1 execution
+on:
+  push:
+    paths-ignore:
+      - 'evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Train and log the MLflow run
+        run: |
+          pip install -r requirements.txt
+          mlflow server --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000 > /tmp/mlflow.log 2>&1 &
+          for i in {1..90}; do
+            curl -fsS http://127.0.0.1:5000/health && break
+            sleep 2
+          done
+          python train.py
+      - name: Deploy the model on Kubernetes
+        run: |
+          kind create cluster --name mlops --image kindest/node:v1.34.0 --wait 120s
+          docker build -t mlops-lab01:local .
+          kind load docker-image mlops-lab01:local --name mlops
+          kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.8.0/components.yaml
+          kubectl -n kube-system patch deployment metrics-server --type=json -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+          kubectl wait --for=condition=Available apiservice/v1beta1.metrics.k8s.io --timeout=180s
+          kubectl create namespace mlops
+          kubectl -n mlops apply -f k8s/model.yaml
+      - name: Verify autoscaling under inference load
+        run: bash scripts/verify-hpa.sh
+      - name: Capture actual run evidence
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+          python scripts/capture.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab01-evidence
+          path: evidence/

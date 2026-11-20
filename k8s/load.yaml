@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iris-load
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 240
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: client
+          image: python:3.12-slim
+          command: ["python", "-u", "-c"]
+          args:
+            - |
+              import concurrent.futures
+              import json
+              import time
+              import urllib.request
+
+              payload = json.dumps({"instances": [[5.1, 3.5, 1.4, 0.2]] * 128}).encode()
+              end = time.monotonic() + 150
+
+              def send():
+                  count = 0
+                  while time.monotonic() < end:
+                      request = urllib.request.Request(
+                          "http://iris:8080/predict", data=payload,
+                          headers={"Content-Type": "application/json"},
+                      )
+                      with urllib.request.urlopen(request, timeout=15) as response:
+                          predictions = json.load(response)["predictions"]
+                          if len(predictions) != 128:
+                              raise RuntimeError("unexpected prediction count")
+                      count += 1
+                  return count
+
+              with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:
+                  print("Successful requests:", sum(pool.map(lambda _: send(), range(12))))

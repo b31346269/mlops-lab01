@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+mlflow.db*
+mlruns/
+mlartifacts/
+model.joblib
+evidence/*.json
+evidence/*.txt
