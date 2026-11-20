@@ -1,0 +1,47 @@
+Waiting for deployment "iris" rollout to finish: 0 of 1 updated replicas are available...
+deployment "iris" successfully rolled out
+Before load
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 1%/50%   1         4         1          47s
+job.batch/iris-load created
+13:05:17 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 1%/50%   1         4         1          47s
+13:05:22 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 1%/50%   1         4         1          52s
+13:05:27 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 1%/50%   1         4         1          57s
+13:05:32 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          62s
+13:05:37 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          67s
+13:05:42 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          72s
+13:05:48 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          78s
+13:05:53 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          83s
+13:05:58 UTC
+NAME   REFERENCE         TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 8%/50%   1         4         1          88s
+13:06:03 UTC
+NAME   REFERENCE         TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 500%/50%   1         4         1          93s
+13:06:08 UTC
+NAME   REFERENCE         TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+iris   Deployment/iris   cpu: 500%/50%   1         4         1          98s
+Ready replicas: 1 -> 4
+NAME                    READY   STATUS    RESTARTS   AGE
+iris-6ddc88c79f-frb2n   1/1     Running   0          8s
+iris-6ddc88c79f-js6lj   1/1     Running   0          8s
+iris-6ddc88c79f-ngzl9   1/1     Running   0          8s
+iris-6ddc88c79f-rtld6   1/1     Running   0          98s
+job.batch/iris-load condition met
+Successful requests: 56810
