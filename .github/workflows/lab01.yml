@@ -20,12 +20,7 @@ jobs:
       - name: Train and log the MLflow run
         run: |
           pip install -r requirements.txt
-          mlflow server --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000 > /tmp/mlflow.log 2>&1 &
-          for i in {1..90}; do
-            curl -fsS http://127.0.0.1:5000/health && break
-            sleep 2
-          done
-          python train.py
+          MLFLOW_TRACKING_URI=sqlite:///mlflow.db python train.py
       - name: Deploy the model on Kubernetes
         run: |
           kind create cluster --name mlops --image kindest/node:v1.34.0 --wait 120s
@@ -42,6 +37,15 @@ jobs:
         run: |
           pip install playwright
           python -m playwright install --with-deps chromium
+          mlflow ui --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000 --workers 1 > /tmp/mlflow.log 2>&1 &
+          mlflow_pid=$!
+          ready=false
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:5000/health; then ready=true; break; fi
+            kill -0 "$mlflow_pid" 2>/dev/null || break
+            sleep 2
+          done
+          if [[ "$ready" != true ]]; then cat /tmp/mlflow.log; exit 1; fi
           python scripts/capture.py
       - uses: actions/upload-artifact@v4
         if: always()
