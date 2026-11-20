@@ -37,7 +37,7 @@ jobs:
         run: |
           pip install playwright
           python -m playwright install --with-deps chromium
-          mlflow ui --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000 --workers 1 > /tmp/mlflow.log 2>&1 &
+          mlflow server --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000 --workers 1 > /tmp/mlflow.log 2>&1 &
           mlflow_pid=$!
           ready=false
           for i in {1..30}; do
